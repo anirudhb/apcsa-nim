@@ -11,8 +11,11 @@ public class Game {
 
     public static void main(String[] args) {
         Game g = new Game();
+        if (args.length > 1 && args[1].equals("--debug"))
+            g.ai = ExpertSolver.withDebug();
         g.sc = new Scanner(System.in);
-        while (g.play) g.run();
+        while (g.play)
+            g.run();
         g.sc.close();
     }
 
@@ -35,7 +38,7 @@ public class Game {
         // play the game
         int player = 0;
         while (nim.win() == -1) {
-            System.out.println("Player " + (player+1) + "'s turn");
+            System.out.println("Player " + (player + 1) + "'s turn");
             int choice = 0;
             if (useExpertAI && player == aiPlayer) {
                 choice = ai.choose(nim.getPile());
@@ -51,7 +54,7 @@ public class Game {
             player = (player + 1) % 2;
         }
         int winner = nim.win();
-        System.out.println("Player " + (winner+1) + " wins!");
+        System.out.println("Player " + (winner + 1) + " wins!");
 
         System.out.println("\nWould you like to play again? (y for yes)");
         play = sc.nextLine().strip().toLowerCase().equals("y");
