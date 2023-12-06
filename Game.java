@@ -1,5 +1,4 @@
 import java.util.Random;
-import java.util.Scanner;
 
 public class Game {
     Random rng = new Random();
@@ -7,32 +6,28 @@ public class Game {
     // caches results across replays
     ExpertSolver ai = new ExpertSolver();
     boolean play = true;
-    Scanner sc;
+    Input input;
 
     public static void main(String[] args) {
         Game g = new Game();
         if (args.length > 1 && args[1].equals("--debug"))
             g.ai = ExpertSolver.withDebug();
-        g.sc = new Scanner(System.in);
+        g.input = new Input(System.in, System.out);
         while (g.play)
             g.run();
-        g.sc.close();
+        g.input.close();
     }
 
     public void run() {
         System.out.println("Welcome to the game of Nim!\n-----\n");
-        System.out.print("Pile size (leave empty to randomize): ");
-        int pileSize;
-        try {
-            pileSize = Integer.parseInt(sc.nextLine().strip());
-        } catch (NumberFormatException e) {
+        int pileSize = input.getNumberRangeOrEmpty("Pile size (leave empty to randomize): ", 1, Integer.MAX_VALUE);
+        if (pileSize == -1) {
             pileSize = rng.nextInt(100);
             System.out.println("Using a pile with " + pileSize + " items\n");
         }
         nim = new Nim(pileSize);
 
-        System.out.println("Do you want to play against an expert AI? (y for yes)");
-        boolean useExpertAI = sc.nextLine().strip().toLowerCase().equals("y");
+        boolean useExpertAI = input.getBoolean("Do you want to play against an expert AI?");
         int aiPlayer = rng.nextInt(2);
 
         // play the game
@@ -45,8 +40,7 @@ public class Game {
                 System.out.println("AI plays " + choice);
             } else {
                 while (!nim.isValidChoice(choice)) {
-                    System.out.print("Choose how many to take (1-" + nim.maxChoose() + "): ");
-                    choice = Integer.parseInt(sc.nextLine().strip());
+                    choice = input.getNumber("Choose how many to take (1-" + nim.maxChoose() + "): ");
                 }
             }
             nim.play(choice);
@@ -54,9 +48,8 @@ public class Game {
             player = (player + 1) % 2;
         }
         int winner = nim.win();
-        System.out.println("Player " + (winner + 1) + " wins!");
+        System.out.println("Player " + (winner + 1) + " wins!\n");
 
-        System.out.println("\nWould you like to play again? (y for yes)");
-        play = sc.nextLine().strip().toLowerCase().equals("y");
+        play = input.getBoolean("Would you like to play again?");
     }
 }
